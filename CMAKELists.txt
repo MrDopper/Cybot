@@ -1,0 +1,62 @@
+cmake_minimum_required(VERSION 3.10)
+project(Cybot)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/local/include/SDL2 -Wall -D_THREAD_SAFE --std=c++20")
+
+file(GLOB Cybot_SOURCES 
+    src/*.cpp)
+
+# Find required packages
+find_package(PkgConfig REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_mixer REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+
+# Include directories
+include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_MIXER_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
+include_directories(include/)
+
+# Add executable
+add_executable(Cybot ${Cybot_SOURCES})
+
+# Include directories for the target
+target_include_directories(Cybot PRIVATE include/)
+
+
+# Check if the res directory exists
+if(EXISTS ${CMAKE_BINARY_DIR}/res)
+    message(STATUS "Directory res already exists. Checking for additional files.")
+    # List all files in the source and destination res directories
+    file(GLOB SOURCE_FILES ${CMAKE_SOURCE_DIR}/res/*)
+    file(GLOB DESTINATION_FILES ${CMAKE_BINARY_DIR}/res/*)
+
+    # Check for additional files
+    list(LENGTH SOURCE_FILES NUM_SOURCE_FILES)
+    list(LENGTH DESTINATION_FILES NUM_DESTINATION_FILES)
+
+    if(NUM_SOURCE_FILES GREATER NUM_DESTINATION_FILES)
+        message(STATUS "Found additional files. Copying new files.")
+        foreach(FILE ${SOURCE_FILES})
+            # Copy only if the file doesn't exist in the destination
+            get_filename_component(FILENAME ${FILE} NAME)
+            if(NOT EXISTS ${CMAKE_BINARY_DIR}/res/${FILENAME})
+                file(COPY ${FILE} DESTINATION ${CMAKE_BINARY_DIR}/res/)
+            endif()
+        endforeach()
+    else()
+        message(STATUS "No additional files to copy.")
+    endif()
+else()
+    message(STATUS "Directory res does not exist. Copying the entire directory.")
+    # Copy the entire res directory
+    file(COPY ${CMAKE_SOURCE_DIR}/res DESTINATION ${CMAKE_BINARY_DIR}/)
+endif()
+
+# Link SDL2 and its related libraries
+target_link_libraries(Cybot PRIVATE ${SDL2_LIBRARIES} SDL2_image::SDL2_image SDL2_mixer::SDL2_mixer SDL2_ttf::SDL2_ttf)
+
+message(STATUS "SDL2 Include Dirs: ${SDL2_INCLUDE_DIRS}")
+message(STATUS "SDL2 Libraries: ${SDL2_LIBRARIES}")
