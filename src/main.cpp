@@ -6,7 +6,7 @@
 #include "cleanup.h"
 #include "res_path.h"
 #include "drawing_functions.h"
-
+#include "Globals.h"
 using std::cout;
 using std::endl;
 using std::string;
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     // Create Window
     cout << "Creating window..." << endl;
-    SDL_Window *window = SDL_CreateWindow("Cybot_game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 320, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    SDL_Window *window = SDL_CreateWindow("Cybot_game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Globals::ScreenWidth * Globals::ScreenScale, Globals::ScreenHeight * Globals::ScreenScale, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
 
     if (window == nullptr)
     {
@@ -47,15 +47,15 @@ int main(int argc, char *argv[])
 
     // Create Renderer
     cout << "Creating renderer..." << endl;
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == nullptr)
+    Globals::renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    if (Globals::renderer == nullptr)
     {
         cout << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
     }
-    SDL_RenderSetLogicalSize(renderer, 640, 320);
+    SDL_RenderSetLogicalSize(Globals::renderer, Globals::ScreenWidth, Globals::ScreenHeight);
     cout << "Renderer created successfully!" << endl;
 
     // Initialize SDL_image for PNG support
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     if ((IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG) != IMG_INIT_PNG)
     {
         cout << "IMG_Init Error: " << IMG_GetError() << endl;
-        SDL_DestroyRenderer(renderer);
+        SDL_DestroyRenderer(Globals::renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     {
         cout << "TTF_Init Error: " << TTF_GetError() << endl;
         IMG_Quit();
-        SDL_DestroyRenderer(renderer);
+        SDL_DestroyRenderer(Globals::renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
         cout << "Mix_OpenAudio Error: " << Mix_GetError() << endl;
         TTF_Quit();
         IMG_Quit();
-        SDL_DestroyRenderer(renderer);
+        SDL_DestroyRenderer(Globals::renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
@@ -100,14 +100,14 @@ int main(int argc, char *argv[])
     // Load a texture to draw
     cout << "Loading texture..." << endl;
     string resPath = getResourcePath(); // Assuming getResourcePath() returns the correct path
-    SDL_Texture *texture = loadTexture(resPath + "map.png", renderer);
+    SDL_Texture *texture = loadTexture(resPath + "map.png", Globals::renderer);
     if (!texture)
     {
         cout << "Failed to load texture: " << SDL_GetError() << endl;
         Mix_CloseAudio();
         TTF_Quit();
         IMG_Quit();
-        SDL_DestroyRenderer(renderer);
+        SDL_DestroyRenderer(Globals::renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
@@ -129,16 +129,16 @@ int main(int argc, char *argv[])
         }
 
         // Clear the screen
-        SDL_RenderClear(renderer);
+        SDL_RenderClear(Globals::renderer);
         // Draw the texture
-        renderTexture(texture, renderer, 0, 0);
+        renderTexture(texture, Globals::renderer, 0, 0);
         // Present the rendered image
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(Globals::renderer);
     }
 
     // Cleanup resources
     cleanup(texture);
-    cleanup(renderer);
+    cleanup(Globals::renderer);
     cleanup(window);
 
     SafeQuit();
