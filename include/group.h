@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 #include <list>
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include "dataGroupType.h"
 
 using namespace std;

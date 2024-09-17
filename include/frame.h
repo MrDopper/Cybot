@@ -12,6 +12,7 @@
 using namespace std;
 class Frame
 {
+public:
     // Or frame index
     int frameNumber;
     // It the region on the spritesheet where this frame is
@@ -23,6 +24,7 @@ class Frame
     // holds groups of addtional data for the frame
     list<Group *> frameData;
     void draw(SDL_Texture *spriteSheet, float x, float y);
+    void loadFrame(ifstream &file, list<DataGroupType> &groupTypes);
 };
 
 #endif
