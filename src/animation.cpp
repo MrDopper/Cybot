@@ -1,6 +1,6 @@
 #include "animation.h"
 
-Animation::Animation(string name = " ")
+Animation::Animation(string name)
 {
     this->name = name;
 }
