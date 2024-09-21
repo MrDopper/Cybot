@@ -8,7 +8,7 @@ void Entity::update() { ; }
 void Entity::draw()
 {
     // draws current frame
-    if (currentFrame != nullptr && active)
+    if (currentFrame != NULL && active)
     {
         currentFrame->draw(animSet->spriteSheet, x, y);
     }
@@ -265,7 +265,7 @@ float Entity::angleBetweenTwoRects(SDL_Rect &r1, SDL_Rect &r2)
     return angleBetweenTwoPoints(cx1, cy1, cx2, cy2);
 }
 // global entities list I can refer to at anytime
-list<Entity *> entities;
+list<Entity *> Entity::entities;
 // Compare two entity on the list to help sorting(sorts base on the y)
 bool Entity::EntityCompare(const Entity *const &a, const Entity *const &b)
 {
